@@ -2,13 +2,14 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven'
+        maven 'Maven'  // Replace with actual tool names from Jenkins configuration
+        jdk 'JDK'
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'master', url: 'https://github.com/yasasvini2818/MavenSelenium.git'
+                checkout scm
             }
         }
 
@@ -23,17 +24,20 @@ pipeline {
                 sh 'mvn test'
             }
         }
+
+        stage('Archive Artifacts') {
+            steps {
+                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+            }
+        }
     }
 
     post {
-        always {
-            junit 'target/surefire-reports/*.xml'
-        }
         success {
-            echo 'Build and tests successful!'
+            echo 'Pipeline completed successfully!'
         }
         failure {
-            echo 'Build or tests failed!'
+            echo 'Pipeline failed!'
         }
     }
 }
