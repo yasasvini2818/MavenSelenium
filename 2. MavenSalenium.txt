@@ -1,0 +1,175 @@
+/* Maven Project To Connect To Web Servers Using Selenium Dependency
+
+ /******show the sample web page 
+https://www.saucedemo.com/
+
+with its user name and password
+
+/***********create a maven project on terminal
+mvn archetype:generate -DgroupId=com.example -DartifactId=MyMavenSeleniumApp01 -DarchetypeArtifactiId=maven-archetype-quickstart -DinteractiveMode=false
+
+/********Before we connect to web servers we need to have chrome driver installed
+/*********************to download chrome driver***********************************
+
+/*** you check the chrome version 
+$google-chrome --version
+Google Chrome 134.0.6998.35
+
+CHROME_VERSION=$(google-chrome --version | awk '{print $3}' | cut -d'.' -f1-3)  // extracts the version and stores it in a variable CHROME_VERSION
+
+sudo apt install jq   //  extracts and transorms JSON data
+
+LATEST_DRIVER=$(curl -s "https://googlechromelabs.github.io/chrome-for-testing/latest-patch-versions-per-build.json" | jq -r ".builds[\"$CHROME_VERSION\"].version")
+
+//note: if it gives error saying curl is not found, do install curl using the command 
+sudo apt install curl
+
+wget https://storage.googleapis.com/chrome-for-testing-public/$LATEST_DRIVER/linux64/chromedriver-linux64.zip
+
+/**********Extract and move it to /usr/local/bin/:
+
+unzip chromedriver-linux64.zip
+sudo mv chromedriver-linux64/chromedriver /usr/local/bin/chromedriver
+sudo chmod +x /usr/local/bin/chromedriver
+
+
+Check if ChromeDriver is installed correctly:
+
+chromedriver --version  
+ 133.0.6943.141 //same as google chrome version
+ 
+ 
+ /***********edit the pom.xml file ***********************/
+ //******Add the selenium dependency 
+ //go to maven central repository, search selenium and select selenium java and click on latest version and copy the dependency and paste it in pom.xml
+ 
+ <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.example</groupId>
+  <artifactId>MyMavenSeleniumApp01</artifactId>
+  <packaging>jar</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <name>MyMavenSeleniumApp01</name>
+  <url>http://maven.apache.org</url>
+  
+  
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    
+    
+    <!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java -->
+<dependency>
+    <groupId>org.seleniumhq.selenium</groupId>
+    <artifactId>selenium-java</artifactId>
+    <version>4.29.0</version>
+</dependency>
+
+    
+    
+    
+    
+  </dependencies>
+  
+  
+  
+  <!-- Build: Configuring plugins and build settings -->
+<build>
+<plugins>
+<!-- Example: Maven Compiler Plugin to compile Java code -->
+<plugin>
+<groupId>org.apache.maven.plugins</groupId>
+<artifactId>maven-compiler-plugin</artifactId>
+<version>3.8.1</version>
+<configuration>
+<source>1.7</source>
+<target>1.7</target>
+</configuration>
+</plugin>
+<!-- Example: Maven Surefire Plugin to run tests -->
+<plugin>
+<groupId>org.apache.maven.plugins</groupId>
+<artifactId>maven-surefire-plugin</artifactId>
+<version>2.22.2</version>
+</plugin>
+<plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            
+            <artifactId>maven-jar-plugin</artifactId>
+            <version>3.0.1</version> 
+           
+            
+          
+      
+      
+      
+      
+           <configuration>
+                <archive>
+                    <manifestEntries>
+                        <Main-Class>com.example.App</Main-Class>
+                    </manifestEntries>
+                </archive>
+            </configuration> 
+            
+            
+        </plugin>
+</plugins>
+</build>
+  
+  
+  
+  
+  
+  
+</project>
+ 
+ /*************Before writing the App.java show them how to inspect on sauce.demo webpage to get user name and password and login -button ids 
+ // right click on web page and go to inspect, we can see the html file and click the cursor on the arrow mark available at the left end and place the cursor on username tab it shows the id used by as user-name, same on password: password, login button:login-button do make a note of these to write it in App.java file
+  
+/*****************App.java for selenium project
+
+package com.example;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+
+/**
+ * Hello world!
+ *
+ */
+public class App 
+{
+    public static void main( String[] args )
+    {
+        WebDriver driver=new ChromeDriver();
+        driver.get("https://www.saucedemo.com/");
+        driver.manage().window().maximize();
+        driver.findElement(By.id("user-name")).sendKeys("standard_user");
+        driver.findElement(By.id("password")).sendKeys("secret_sauce");
+        driver.findElement(By.id("login-button")).click();
+    }
+}
+
+/***** build and run the maven application
+mvn clean install
+
+java -jar target/MyMavenSeleniumApp01-1.0-SNAPSHOT 
+
+if we get error in executing the above jar file do run the below command 
+mvn exec:java -Dexec.mainClass="com.example.App"
+
+//********* it opens saucedemo.com and we can login using the credentials 
+
+
+
+
+
+
+
